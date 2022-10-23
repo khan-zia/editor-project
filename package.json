@@ -6,8 +6,8 @@
     "apps/*"
   ],
   "scripts": {
-    "frontend:dev": "yarn run dev -w frontend",
-    "backend:dev": "yarn run dev -w backend",
+    "frontend:dev": "cd ./apps/frontend && yarn dev",
+    "backend:dev": "cd ./apps/backend && yarn dev",
     "dev": "run-p frontend:dev backend:dev",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
