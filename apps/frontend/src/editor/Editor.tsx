@@ -4,7 +4,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { createEditor, Descendant, BaseEditor } from 'slate';
 import { withHistory, HistoryEditor } from 'slate-history';
 import { handleHotkeys } from './helpers';
-
 import { Editable, withReact, Slate, ReactEditor } from 'slate-react';
 import { EditorToolbar } from './EditorToolbar';
 import { CustomElement } from './CustomElement';

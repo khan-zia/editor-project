@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Toolbar, Typography, Drawer, Divider, Box, Container } from '@mui/material';
+import NoteAddRoundedIcon from '@mui/icons-material/NoteAddRounded';
 import { NotesList } from '../notes';
+import NewNoteDialog from '../notes/NewNoteDialog';
 
 const drawerWidth = 240;
 
@@ -9,43 +11,63 @@ interface InterfaceProps {
 }
 
 const Interface: React.FC<InterfaceProps> = ({ activeNoteId, children }) => {
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-      >
-        <Toolbar>
-          <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-            Notes
-          </Typography>
-        </Toolbar>
-        <Divider />
-        <NotesList activeNoteId={activeNoteId} />
-        <Divider />
-      </Drawer>
+  const [open, setOpen] = useState<boolean>(false);
 
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          height: '100vh',
-          backgroundColor: '#eee',
-          overflow: 'auto',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          {children}
-        </Container>
+  const addNewNote = () => {
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <Box sx={{ display: 'flex' }}>
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
+        >
+          <Toolbar>
+            <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
+              Notes
+            </Typography>
+            <NoteAddRoundedIcon
+              fontSize="large"
+              sx={{
+                color: '#7c7c7c',
+                '&:hover': {
+                  color: '#3c3c3c',
+                  cursor: 'pointer',
+                },
+              }}
+              onClick={addNewNote}
+            />
+          </Toolbar>
+          <Divider />
+          <NotesList activeNoteId={activeNoteId} />
+          <Divider />
+        </Drawer>
+
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            height: '100vh',
+            backgroundColor: '#eee',
+            overflow: 'auto',
+          }}
+        >
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            {children}
+          </Container>
+        </Box>
       </Box>
-    </Box>
+      <NewNoteDialog open={open} handleClose={() => setOpen(false)} />
+    </>
   );
 };
 
