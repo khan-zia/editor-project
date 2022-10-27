@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
-import { NotesResponse, NoteResponse } from '../../../backend/routes/notes';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
-import { WebSocketHook } from 'react-use-websocket/dist/lib/types';
+import { io, ManagerOptions, Socket, SocketOptions } from 'socket.io-client';
+import { NotesResponse } from '../../../backend/routes/notes';
 
 interface ServerRequest {
   isLoading: boolean;
@@ -105,18 +104,28 @@ export const useNotesList = () => {
   };
 };
 
-export const useNote = (id: string) => {
-  const { readyState, lastMessage, sendMessage } = useWebSocket(`ws://localhost:3001/api/notes/${id}`);
+/**
+ * Initialize a websocket connection with referential integrity. Component re-renders will not cause
+ * multiple connections.
+ */
+export const useSocket = (url: string, options?: Partial<ManagerOptions & SocketOptions> | undefined): Socket => {
+  const { current: socket } = useRef(
+    io(url, {
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+      autoConnect: false,
+      ...options,
+    }),
+  );
 
-  // Send a message when ready on first load
+  // Close socket if the component unmounts.
   useEffect(() => {
-    if (readyState === ReadyState.OPEN && lastMessage === null) {
-      sendMessage('');
-    }
-  }, [readyState, lastMessage]);
+    return () => {
+      if (socket) {
+        socket.close();
+      }
+    };
+  }, [socket]);
 
-  return {
-    note: lastMessage && (JSON.parse(lastMessage.data) as NoteResponse),
-    readyState,
-  };
+  return socket;
 };

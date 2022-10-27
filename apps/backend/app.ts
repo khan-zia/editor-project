@@ -1,12 +1,18 @@
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
-import expressWs from 'express-ws';
+import { ServerSocket } from './socket';
 
 import apiRoutes from './routes';
 
-const app = express();
 const PORT = 3001;
-expressWs(app);
+const app = express();
+
+// Create an HTTP server.
+const httpServer = http.createServer(app);
+
+// Initiate websocket on the server.
+export const socket = new ServerSocket(httpServer);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -14,6 +20,6 @@ app.use(cors());
 
 app.use('/api', apiRoutes);
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
 });
