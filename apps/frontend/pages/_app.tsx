@@ -1,8 +1,10 @@
+import React from 'react';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import CssBaseline from '@mui/material/CssBaseline';
+import SocketContextComponent from '../src/context/SocketContextComponent';
 
-function MyApp({ Component, pageProps }: AppProps) {
+const MyApp = ({ Component, pageProps }: AppProps): JSX.Element => {
   return (
     <>
       <Head>
@@ -11,8 +13,10 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
       </Head>
       <CssBaseline />
-      <Component {...pageProps} />
+      <SocketContextComponent>
+        <Component {...pageProps} />
+      </SocketContextComponent>
     </>
   );
-}
+};
 export default MyApp;
