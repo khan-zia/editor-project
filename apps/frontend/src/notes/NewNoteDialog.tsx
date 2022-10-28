@@ -9,8 +9,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useServerRequest } from './hooks';
-import { NoteResponse } from '../../../backend/routes/notes';
+import { Note } from '../../../backend/routes/notes';
 import { useSWRConfig } from 'swr';
+import { useSocketContext } from '../context/socketContext';
 
 interface NewNoteDialogProps {
   open: boolean;
@@ -18,17 +19,14 @@ interface NewNoteDialogProps {
 }
 
 const NewNoteDialog: React.FC<NewNoteDialogProps> = ({ open, handleClose }) => {
+  const { executeRequest: createNewNote, isLoading, isError } = useServerRequest('post', 'api/notes');
+
   const [title, setTitle] = useState('');
-  const {
-    executeRequest: createNewNote,
-    isLoading,
-    isSuccess,
-    isError,
-  } = useServerRequest('post', 'http://localhost:3001/api/notes');
   const [error, setError] = useState<string | undefined>(undefined);
-  const [note, SetNote] = useState<NoteResponse | undefined>(undefined);
   const router = useRouter();
   const { mutate } = useSWRConfig();
+
+  const { socket } = useSocketContext();
 
   const create = async () => {
     if (!title) {
@@ -37,17 +35,22 @@ const NewNoteDialog: React.FC<NewNoteDialogProps> = ({ open, handleClose }) => {
     }
 
     // create a new note.
-    const newNote = (await createNewNote({ title })) as NoteResponse;
-    SetNote(newNote);
-  };
+    const newNote: Note | void = await createNewNote({ title });
 
-  useEffect(() => {
-    if (isSuccess && note) {
-      handleClose();
+    if (newNote) {
+      // Let other clients know about the new note in real time.
+      socket?.emit('new-note-created', newNote.id, newNote.title);
+
+      // Revalidate notes list data (refetch).
       mutate('http://localhost:3001/api/notes');
-      router.push(`/notes/${note.id}`);
+
+      // Close the dialog
+      handleClose();
+
+      // Navigate to the newly created note's page.
+      router.push(`/notes/${newNote.id}`);
     }
-  }, [isSuccess, note]);
+  };
 
   useEffect(() => {
     if (isError) {

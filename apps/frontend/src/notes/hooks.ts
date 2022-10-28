@@ -39,6 +39,13 @@ const fetcher = async (input: RequestInfo, init: RequestInit) => {
   return res.json();
 };
 
+/**
+ * Simple hook to make a server request. Exposes helper methods such as "abort" and "reset" and
+ * request status.
+ *
+ * @param method Request method.
+ * @param url URL relative to server's base. Without leading slash '/'.
+ */
 export const useServerRequest = (method: 'get' | 'post' | 'put' | 'delete', url: string): ServerRequest => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -47,11 +54,14 @@ export const useServerRequest = (method: 'get' | 'post' | 'put' | 'delete', url:
 
   const executeRequest: ServerRequest['executeRequest'] = async (data = null) => {
     setIsLoading(true);
+    setIsSuccess(false);
+    setIsError(false);
 
     try {
       abortController.current = new AbortController();
 
-      const res = await fetch(url, {
+      // Todo: Base URL would typically come from an env.
+      const res = await fetch(`http://localhost:3001/${url}`, {
         method,
         ...(data && {
           body: JSON.stringify(data),
@@ -107,10 +117,13 @@ export const useNotesList = () => {
 /**
  * Initialize a websocket connection with referential integrity. Component re-renders will not cause
  * multiple connections.
+ *
+ * @param url The websocket server URL. Defaults to "ws://localhost:3001"
  */
-export const useSocket = (url: string, options?: Partial<ManagerOptions & SocketOptions> | undefined): Socket => {
+export const useSocket = (url?: string, options?: Partial<ManagerOptions & SocketOptions> | undefined): Socket => {
+  // Todo: Base socket server URL would typically come from an env.
   const { current: socket } = useRef(
-    io(url, {
+    io(url || 'ws://localhost:3001', {
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
       autoConnect: false,

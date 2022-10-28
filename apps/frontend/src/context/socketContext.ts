@@ -1,44 +1,62 @@
 import { createContext, useContext } from 'react';
 import { Socket } from 'socket.io-client';
-import { NoteResponse } from '../../../backend/routes/notes';
+import { Note, NoteResponse } from '../../../backend/routes/notes';
 import { ClientToServerEvents, ServerToClientEvents } from '../../../backend/socket';
-
 export interface SocketState {
-  notes: Array<NoteResponse>;
-  newNoteCreated: undefined | NoteResponse;
+  /**
+   * These notes represent items of the side bar menu. The menu items will be
+   * updated in real time when an item's title is changed or when a new item
+   * (note) is added.
+   */
+  notes: Array<Note>;
+
+  /**
+   * This is the note that's currently loaded by the SingleNote component.
+   * State updates for collaborative editing.
+   */
   note: undefined | NoteResponse;
 }
 
-export type SocketActionTypes = 'new_note' | 'new_note_broadcasted' | 'update_note' | 'update_title' | 'update_notes';
+export type SocketActionTypes = 'add_menu' | 'add_note' | 'update_title' | 'update_note' | 'update_current_title';
 
 export interface SocketActions {
   type: SocketActionTypes;
-  payload: unknown;
+  payload: string | Note | NoteResponse | Array<Note>;
 }
 
 // Define a default state
 export const defaultSocketState: SocketState = {
   notes: [],
-  newNoteCreated: undefined,
   note: undefined,
 };
 
-export const SocketReducer = (state: SocketState, action: SocketActions): SocketState => {
+export const socketReducer = (state: SocketState, action: SocketActions): SocketState => {
   switch (action.type) {
-    case 'new_note':
-      return { ...state, newNoteCreated: action.payload as SocketState['newNoteCreated'] };
-    case 'new_note_broadcasted':
-      return { ...state, newNoteCreated: undefined };
+    case 'add_menu':
+      return { ...state, notes: action.payload as Array<Note> };
+
+    case 'add_note':
+      return { ...state, notes: [action.payload as Note, ...state.notes] };
+
+    // Updates title for the side menu.
+    case 'update_title':
+      return {
+        ...state,
+        notes: state.notes.map((n) => (n.id === (action.payload as Note).id ? (action.payload as Note) : n)),
+      };
+
     case 'update_note':
       return { ...state, note: action.payload as NoteResponse };
-    case 'update_title':
+
+    // Updates title for the SingleNote component to track title changes
+    // for toggling the "save" button.
+    case 'update_current_title':
       if (state.note) {
         return { ...state, note: { ...state.note, title: action.payload as string } };
       } else {
         return state;
       }
-    case 'update_notes':
-      return { ...state, notes: [...state.notes, action.payload as NoteResponse] };
+
     default:
       return state;
   }
