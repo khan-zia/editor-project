@@ -11,11 +11,7 @@ interface SingleNoteProps {
 }
 
 const Home: React.FC<SingleNoteProps> = ({ id }) => {
-  const {
-    socket,
-    socketState: { note },
-    socketDispatch,
-  } = useSocketContext();
+  const { socket, socketDispatch } = useSocketContext();
 
   const {
     executeRequest: getNoteById,
@@ -35,6 +31,7 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
 
   const [connectionStatusColor, setConnectionStatusColor] = useState<BadgeTypeMap['props']['color']>('error');
   const [title, setTitle] = useState<string>('');
+  const [note, setNote] = useState<NoteResponse | undefined>(undefined);
 
   /**
    * Initializes current note:
@@ -45,13 +42,20 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
    * - Start listening for room's events.
    */
   const initializeNote = useCallback(async () => {
-    const fetched = (await getNoteById()) as NoteResponse;
-    if (fetched) {
-      socketDispatch({
-        type: 'update_note',
-        payload: fetched,
-      });
+    // Because Next.js hydrates client side route/query params after the first render,
+    // make sure the ID from the URL is defined before executing the request.
+    if (!id || id === 'undefined') {
+      return;
+    }
 
+    const fetched: NoteResponse | void = await getNoteById();
+
+    // If the promise resolves with non-void value, note has been fetched.
+    if (fetched) {
+      setNote(fetched);
+
+      // Set note's title separately to track changes to it for dynamically displaying
+      // the "save" button.
       setTitle(fetched.title);
 
       // Join socket room by note id.
@@ -70,6 +74,8 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
   useEffect(() => {
     initializeNote();
 
+    // Abort previous request if any before running a new request,
+    // Or abort a running request if the component unmounts.
     return () => abort();
   }, [initializeNote]);
 
@@ -141,7 +147,7 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
               flexDirection: 'column',
             }}
           >
-            <Editor initialValue={note.content} />
+            <Editor id={id} initialValue={note.content} />
           </Paper>
         </>
       )}

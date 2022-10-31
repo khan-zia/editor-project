@@ -80,6 +80,19 @@ const updateNoteTitleHandler: RequestHandler = async (req, res: Response<true | 
   }
 };
 
+// Update a note's content
+const updateNoteContentHandler: RequestHandler = async (req, res: Response<true | null>) => {
+  try {
+    await db.collection('notes').doc(req.params.id).update({
+      content: req.body.content, // Already stringified by the frontend.
+    });
+
+    res.json(true);
+  } catch (_e) {
+    res.status(500).json(null);
+  }
+};
+
 const noteHandler: RequestHandler = async (req: Request, res: Response<NoteResponse | null>) => {
   try {
     const noteResult = await db.collection('notes').doc(req.params.id).get();
@@ -101,6 +114,7 @@ const noteHandler: RequestHandler = async (req: Request, res: Response<NoteRespo
 router.post('/', createNoteHandler);
 router.get('/', notesHandler);
 router.put('/:id/title', updateNoteTitleHandler);
+router.put('/:id/content', updateNoteContentHandler);
 router.get('/:id', noteHandler);
 
 export default router;
