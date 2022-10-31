@@ -1,35 +1,20 @@
 // @refresh reset // Fixes hot refresh errors in development https://github.com/ianstormtaylor/slate/issues/3477
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { createEditor, Descendant, BaseEditor } from 'slate';
-import { withHistory, HistoryEditor } from 'slate-history';
+import React, { useEffect, useState } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 import { Alert, Box, LinearProgress, Snackbar } from '@mui/material';
 import DoneRoundedIcon from '@mui/icons-material/DoneRounded';
-import { handleHotkeys } from './helpers';
-import { Editable, withReact, Slate, ReactEditor } from 'slate-react';
-import { EditorToolbar } from './EditorToolbar';
-import { CustomElement } from './CustomElement';
-import { CustomLeaf, CustomText } from './CustomLeaf';
 import { useServerRequest } from '../notes/hooks';
-
-// Slate suggests overwriting the module to include the ReactEditor, Custom Elements & Text
-// https://docs.slatejs.org/concepts/12-typescript
-declare module 'slate' {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor & HistoryEditor;
-    Element: CustomElement;
-    Text: CustomText;
-  }
-}
+import PlateEditor from './Plate';
+import { MyValue } from '../plate/typescript/plateTypes';
 
 interface EditorProps {
   id: string;
-  initialValue?: Descendant[];
+  initialValue?: MyValue | undefined;
   placeholder?: string;
 }
 
-export const Editor: React.FC<EditorProps> = ({ id, initialValue = [], placeholder }) => {
+export const Editor: React.FC<EditorProps> = ({ id, initialValue }) => {
   const {
     executeRequest: saveNote,
     isLoading,
@@ -38,10 +23,6 @@ export const Editor: React.FC<EditorProps> = ({ id, initialValue = [], placehold
     reset,
   } = useServerRequest('put', `api/notes/${id}/content`);
   const [updatedContent, setUpdatedContent] = useState<string | undefined>(undefined);
-  const renderElement = useCallback((props) => <CustomElement {...props} />, []);
-  const renderLeaf = useCallback((props) => <CustomLeaf {...props} />, []);
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
-
   /**
    * Handle saving the note automatically when there are changes.
    * Auto-saving is throttled to reduce network load. Currently, once every 15 secs.
@@ -57,7 +38,7 @@ export const Editor: React.FC<EditorProps> = ({ id, initialValue = [], placehold
       // Process saving updated content.
       saveNote({ content: updatedContent });
     },
-    15000, // Save once every 15 seconds.
+    12000, // Save once every 12 seconds.
     { leading: false }, // Do not fire immediately when called.
   );
 
@@ -69,19 +50,15 @@ export const Editor: React.FC<EditorProps> = ({ id, initialValue = [], placehold
   useEffect(() => () => throttledSave.flush(), []);
 
   // Handle changes for content of the editor.
-  const onChange = (value: Descendant[]) => {
-    // Ignore selections.
-    const contentChanged = editor.operations.some((op) => 'set_selection' !== op.type);
-    if (contentChanged) {
-      // Stringify and store the current content.
-      const content = JSON.stringify(value);
-      setUpdatedContent(content);
+  // const onChange = (value: Descendant[]) => {
+  const onChange = (value: MyValue) => {
+    const content = JSON.stringify(value);
+    setUpdatedContent(content);
 
-      // socket?.emit('note-updated', id, content);
+    // socket?.emit('note-updated', id, content);
 
-      // Invoke auto-save upon changes.
-      throttledSave();
-    }
+    // Invoke auto-save upon changes.
+    throttledSave();
   };
 
   // Handle closure of SnackBars on this component.
@@ -96,33 +73,18 @@ export const Editor: React.FC<EditorProps> = ({ id, initialValue = [], placehold
 
   return (
     <>
-      <Slate editor={editor} value={initialValue} onChange={onChange}>
-        <EditorToolbar />
-        {(isLoading || isSuccess) && (
-          <Box mt={1} style={{ width: '100%', height: '1.5rem', display: 'flex', alignItems: 'center' }}>
-            {isLoading ? (
-              <LinearProgress sx={{ width: '100%' }} />
-            ) : (
-              <Box
-                sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'end', color: '#7c7c7c' }}
-              >
-                <DoneRoundedIcon color="success" /> Saved
-              </Box>
-            )}
-          </Box>
-        )}
-        <Editable
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder={placeholder}
-          onKeyDown={handleHotkeys(editor)}
-          // The dev server injects extra values to the editr and the console complains
-          // so we override them here to remove the message
-          autoCapitalize="false"
-          autoCorrect="false"
-          spellCheck="false"
-        />
-      </Slate>
+      {(isLoading || isSuccess) && (
+        <Box mt={1} style={{ width: '100%', height: '1.5rem', display: 'flex', alignItems: 'center' }}>
+          {isLoading ? (
+            <LinearProgress sx={{ width: '100%' }} />
+          ) : (
+            <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'end', color: '#7c7c7c' }}>
+              <DoneRoundedIcon color="success" /> Saved
+            </Box>
+          )}
+        </Box>
+      )}
+      <PlateEditor initialValue={initialValue} onChange={onChange} />
       <Snackbar
         open={isError}
         autoHideDuration={5000}
