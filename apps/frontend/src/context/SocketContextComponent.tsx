@@ -13,9 +13,9 @@ const SocketContextComponent: React.FC<unknown> = (props) => {
   // Set up a websocket connection. Hook automatically disconnects upon un-mount.
   const socket: Socket<ServerToClientEvents, ClientToServerEvents> = useSocket();
 
-  // Register general socket events.
+  // Register app-wide socket events.
   const registerEvents = () => {
-    // When a new note is added.
+    // When a new note is added by a remote client, add it to the sidebar menu.
     socket.on('incoming-new-note', (noteId, newTitle) => {
       socketDispatch({
         type: 'add_note',
@@ -23,19 +23,11 @@ const SocketContextComponent: React.FC<unknown> = (props) => {
       });
     });
 
-    // When a note's title is updated.
+    // When a note's title is updated by a remote client, update it in the sidebar menu.
     socket.on('incoming-new-title', (noteId, newTitle) => {
-      // Update note's title in the side bar menu.
       socketDispatch({
         type: 'update_title',
         payload: { id: noteId, title: newTitle },
-      });
-
-      // Update note's title in case note is open via the SingleNote component
-      // for other clients.
-      socketDispatch({
-        type: 'update_current_title',
-        payload: newTitle,
       });
     });
 

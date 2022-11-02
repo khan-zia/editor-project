@@ -1,6 +1,4 @@
 import React from 'react';
-// import { FormatIndentDecrease } from '@styled-icons/material/FormatIndentDecrease';
-// import { FormatIndentIncrease } from '@styled-icons/material/FormatIndentIncrease';
 import FormatIndentDecreaseRoundedIcon from '@mui/icons-material/FormatIndentDecreaseRounded';
 import FormatIndentIncreaseRoundedIcon from '@mui/icons-material/FormatIndentIncreaseRounded';
 import { indent, outdent, ToolbarButton } from '@udecode/plate';

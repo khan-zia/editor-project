@@ -1,6 +1,4 @@
 import React from 'react';
-// import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
-// import { FormatListNumbered } from '@styled-icons/material/FormatListNumbered';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import FormatListNumberedRoundedIcon from '@mui/icons-material/FormatListNumberedRounded';
 import { ELEMENT_OL, ELEMENT_UL, getPluginType, ListToolbarButton } from '@udecode/plate';

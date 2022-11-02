@@ -1,12 +1,4 @@
 import React from 'react';
-// import { CodeAlt } from '@styled-icons/boxicons-regular/CodeAlt';
-// import { Subscript } from '@styled-icons/foundation/Subscript';
-// import { Superscript } from '@styled-icons/foundation/Superscript';
-// import { FormatBold } from '@styled-icons/material/FormatBold';
-// import { FormatItalic } from '@styled-icons/material/FormatItalic';
-// import { FormatUnderlined } from '@styled-icons/material/FormatUnderlined';
-// import { FormatStrikethrough } from '@styled-icons/material/FormatStrikethrough';
-
 import FormatBoldRoundedIcon from '@mui/icons-material/FormatBoldRounded';
 import FormatItalicRoundedIcon from '@mui/icons-material/FormatItalicRounded';
 import FormatUnderlinedRoundedIcon from '@mui/icons-material/FormatUnderlinedRounded';

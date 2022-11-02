@@ -3,7 +3,6 @@ import { Paper, TextField, Badge, BadgeTypeMap, Snackbar, Alert, Skeleton } from
 import { LoadingButton } from '@mui/lab';
 import { useServerRequest } from './hooks';
 import { Editor } from '../editor';
-import { NoteResponse } from '../../../backend/routes/notes';
 import { useSocketContext } from '../context/socketContext';
 
 interface SingleNoteProps {
@@ -11,15 +10,7 @@ interface SingleNoteProps {
 }
 
 const Home: React.FC<SingleNoteProps> = ({ id }) => {
-  const { socket, socketDispatch } = useSocketContext();
-
-  const {
-    executeRequest: getNoteById,
-    isLoading,
-    isError: getNoteByIdError,
-    reset: resetGetNoteQuery,
-    abort,
-  } = useServerRequest('get', `api/notes/${id}`);
+  const { socket } = useSocketContext();
 
   const {
     executeRequest: updateNoteTitle,
@@ -30,15 +21,18 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
   } = useServerRequest('put', `api/notes/${id}/title`);
 
   const [connectionStatusColor, setConnectionStatusColor] = useState<BadgeTypeMap['props']['color']>('error');
+  const [localTitle, setLocalTitle] = useState<string>(''); // This simply helps toggle the "save" button for title.
   const [title, setTitle] = useState<string>('');
-  const [note, setNote] = useState<NoteResponse | undefined>(undefined);
+  const [content, setContent] = useState<Uint8Array | undefined>(undefined);
+  const [fetching, setFetching] = useState<boolean>(false);
+  const [fetchError, setFetchError] = useState<boolean>(false);
 
   /**
    * Initializes current note:
-   * - Fetch note by the specified ID.
-   * - Set note in the local state.
-   * - Set note's title for real-time tracking.
    * - Join a socket room by note's ID.
+   * - Fetch note by the specified ID.
+   * - Set note's title for real-time tracking.
+   * - Set note's content in the local state.
    * - Start listening for room's events.
    */
   const initializeNote = useCallback(async () => {
@@ -48,35 +42,44 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
       return;
     }
 
-    const fetched: NoteResponse | void = await getNoteById();
+    // Set fetching for loading animation until WS handshake resolves.
+    setFetching(true);
 
-    // If the promise resolves with non-void value, note has been fetched.
-    if (fetched) {
-      setNote(fetched);
+    /**
+     * Join socket room by note id and fetch note's content from the database.
+     * Note's content will be fetched as a byte array (yjs CRDT).
+     */
+    socket?.emit('join-note', id, (title, content) => {
+      // Stop loading animation.
+      setFetching(false);
 
-      // Set note's title separately to track changes to it for dynamically displaying
-      // the "save" button.
-      setTitle(fetched.title);
+      // If no title or content was returned.
+      if (!title || !content) {
+        setFetchError(true);
+        return;
+      }
 
-      // Join socket room by note id.
-      socket?.emit('join-note', id);
+      // Set note's title.
+      setTitle(title);
+      setLocalTitle(title);
 
-      // When other clients updates title of this note.
-      socket?.on('incoming-new-title', (noteId, newTitle) => {
-        if (noteId === id) {
-          setTitle(newTitle);
-        }
-      });
-    }
+      // Set note's content.
+      const typedBufferContent = new Uint8Array(content);
+      setContent(typedBufferContent);
+    });
+
+    // When other clients updates title of this note.
+    socket?.on('incoming-new-title', (noteId, newTitle) => {
+      if (noteId === id) {
+        setTitle(newTitle);
+        setLocalTitle(newTitle);
+      }
+    });
   }, [id]);
 
   // Upon mount, initialize note.
   useEffect(() => {
     initializeNote();
-
-    // Abort previous request if any before running a new request,
-    // Or abort a running request if the component unmounts.
-    return () => abort();
   }, [initializeNote]);
 
   // Handle socket connection status
@@ -91,11 +94,8 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
   // Handle result of updateNoteTitle call.
   useEffect(() => {
     if (noteTitleUpdated) {
-      // Update socket state's note title to hide the "save" button.
-      socketDispatch({
-        type: 'update_current_title',
-        payload: title,
-      });
+      // Update localTitle to hide the "save" button.
+      setLocalTitle(title);
 
       // Emit the title update for other clients.
       socket?.emit('note-title-updated', id, title);
@@ -108,20 +108,20 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
       return;
     }
 
-    // Reset request states to keep the snackbar hidden.
-    resetGetNoteQuery();
+    // Reset states to keep the snackbar hidden.
+    setFetchError(false);
     resetUpdateNoteTitleQuery();
   };
 
   return (
     <>
-      {isLoading && (
+      {fetching && (
         <>
           <Skeleton sx={{ fontSize: '3.5rem', bgcolor: 'white' }} />
           <Skeleton variant="rectangular" height={400} sx={{ bgcolor: 'white' }} />
         </>
       )}
-      {note && !isLoading && (
+      {content && (
         <>
           <Badge color={connectionStatusColor} variant="dot" sx={{ width: '100%' }}>
             <TextField
@@ -132,7 +132,7 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
               sx={{ mb: 2 }}
               onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.currentTarget.value)}
               InputProps={{
-                endAdornment: note?.title !== title && (
+                endAdornment: localTitle !== title && (
                   <LoadingButton loading={noteTitleUpdating} onClick={() => updateNoteTitle({ title })}>
                     Save
                   </LoadingButton>
@@ -147,18 +147,18 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
               flexDirection: 'column',
             }}
           >
-            <Editor id={id} initialValue={note.content} />
+            <Editor id={id} initialValue={content} />
           </Paper>
         </>
       )}
       <Snackbar
-        open={getNoteByIdError || noteTitleUpdateError}
+        open={fetchError || noteTitleUpdateError}
         autoHideDuration={5000}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert severity="error" onClose={handleClose}>
-          {getNoteByIdError && 'Ops! Could not fetch the specified note. Perhaps it does not exist?'}
+          {fetchError && 'Ops! Could not fetch the specified note. Perhaps it does not exist?'}
           {noteTitleUpdateError && "Ops! There was a problem while trying to update note's title."}
         </Alert>
       </Snackbar>

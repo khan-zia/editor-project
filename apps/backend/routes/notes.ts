@@ -1,30 +1,50 @@
-import express, { Request, RequestHandler, Response } from 'express';
-import { Descendant } from 'slate';
+import { slateNodesToInsertDelta } from '@slate-yjs/core';
+import express, { RequestHandler, Response } from 'express';
+import * as Y from 'yjs';
+import multer from 'multer';
 import db from '../firebase';
 
+/**
+ * Since express doesn't come with a built in multipart request support, multer allows
+ * to receive multipart data in an express route.
+ */
+const multerHandler = multer();
 const router = express.Router();
 
 export interface Note {
   id: string;
   title: string;
-  content?: Array<Descendant>;
+  content: ArrayBuffer; // This is because YJS CRDT is represented as a byte array.
 }
 
 export interface NotesResponse {
-  notes: Array<{
-    id: string;
-    title: string;
-  }>;
+  notes: Array<Omit<Note, 'content'>>;
 }
 
-export interface NoteResponse extends Note {
-  content: Array<Descendant>;
-}
+/**
+ * Fetches a note specified by ID from the Firestore database.
+ * @param noteId Firestore ID of the note to fetch.
+ */
+export const fetchNote = async (noteId: string): Promise<Omit<Note, 'id'> | void> => {
+  try {
+    const noteResult = await db.collection('notes').doc(noteId).get();
+
+    const note = noteResult.data() as { title: string; content: ArrayBuffer };
+
+    return {
+      title: note.title,
+      content: note.content,
+    };
+  } catch (_e) {
+    // Safely catch any Firestore crash. Enough for the purpose of this test.
+    return;
+  }
+};
 
 // Get all notes (Only IDs and Titles)
 const notesHandler: RequestHandler = async (_req, res: Response<NotesResponse | null>) => {
   try {
-    const notes = await db.collection('notes').select('title').get();
+    const notes = await db.collection('notes').orderBy('timestamp', 'desc').select('title').get();
 
     res.json({
       notes: notes.docs.map((note) => {
@@ -40,18 +60,22 @@ const notesHandler: RequestHandler = async (_req, res: Response<NotesResponse | 
 };
 
 // Create a new note
-const createNoteHandler: RequestHandler = async (req, res: Response<Note | null>) => {
+const createNoteHandler: RequestHandler = async (req, res: Response<Omit<Note, 'content'> | null>) => {
   try {
-    const emptySlateNote = [
-      {
-        type: 'paragraph',
-        children: [{ text: '' }],
-      },
-    ];
+    // An initial value for the new note.
+    const emptySlateNote = [{ children: [{ text: '' }] }];
+
+    // Convert the note's initial value to a CRDT.
+    const ydoc = new Y.Doc();
+    const deltaVersionOfSlate = slateNodesToInsertDelta(emptySlateNote);
+    const sharedRootDoc = ydoc.get('content', Y.XmlText) as Y.XmlText;
+    sharedRootDoc.applyDelta(deltaVersionOfSlate);
+    const CRDTBytes = Y.encodeStateAsUpdate(ydoc);
 
     const newNote = await db.collection('notes').add({
       title: req.body.title,
-      content: JSON.stringify(emptySlateNote), // Set initial empty value for Slate
+      content: CRDTBytes, // Firestore will save it as Blob.
+      timestamp: Math.floor(Date.now() / 1000), // Used to sort notes for the sidebar menu.
     });
 
     const data = (await newNote.get()).data();
@@ -83,8 +107,13 @@ const updateNoteTitleHandler: RequestHandler = async (req, res: Response<true | 
 // Update a note's content
 const updateNoteContentHandler: RequestHandler = async (req, res: Response<true | null>) => {
   try {
+    // Simple validation
+    if (!req.file) {
+      throw 'No content to update.';
+    }
+
     await db.collection('notes').doc(req.params.id).update({
-      content: req.body.content, // Already stringified by the frontend.
+      content: req.file.buffer,
     });
 
     res.json(true);
@@ -93,28 +122,9 @@ const updateNoteContentHandler: RequestHandler = async (req, res: Response<true 
   }
 };
 
-const noteHandler: RequestHandler = async (req: Request, res: Response<NoteResponse | null>) => {
-  try {
-    const noteResult = await db.collection('notes').doc(req.params.id).get();
-
-    // TODO: Check that the result is not empty.
-
-    const note = noteResult.data() as { title: string; content: string };
-
-    res.send({
-      id: noteResult.id,
-      title: note.title,
-      content: JSON.parse(note.content),
-    });
-  } catch (_e) {
-    res.status(500).json(null);
-  }
-};
-
 router.post('/', createNoteHandler);
 router.get('/', notesHandler);
 router.put('/:id/title', updateNoteTitleHandler);
-router.put('/:id/content', updateNoteContentHandler);
-router.get('/:id', noteHandler);
+router.put('/:id/content', multerHandler.single('content'), updateNoteContentHandler);
 
 export default router;

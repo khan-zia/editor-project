@@ -7,13 +7,6 @@ import BorderTopRoundedIcon from '@mui/icons-material/BorderTopRounded';
 import BorderLeftRoundedIcon from '@mui/icons-material/BorderLeftRounded';
 import BorderRightRoundedIcon from '@mui/icons-material/BorderRightRounded';
 
-// import { BorderAll } from '@styled-icons/material/BorderAll';
-// import { BorderBottom } from '@styled-icons/material/BorderBottom';
-// import { BorderClear } from '@styled-icons/material/BorderClear';
-// import { BorderLeft } from '@styled-icons/material/BorderLeft';
-// import { BorderRight } from '@styled-icons/material/BorderRight';
-// import { BorderTop } from '@styled-icons/material/BorderTop';
-
 import {
   deleteColumn,
   deleteRow,

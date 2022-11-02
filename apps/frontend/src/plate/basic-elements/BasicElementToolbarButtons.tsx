@@ -8,15 +8,6 @@ import Looks4RoundedIcon from '@mui/icons-material/Looks4Rounded';
 import Looks5RoundedIcon from '@mui/icons-material/Looks5Rounded';
 import Looks6RoundedIcon from '@mui/icons-material/Looks6Rounded';
 
-// import { CodeBlock } from '@styled-icons/boxicons-regular/CodeBlock';
-// import { FormatQuote } from '@styled-icons/material/FormatQuote';
-// import { Looks3 } from '@styled-icons/material/Looks3';
-// import { Looks4 } from '@styled-icons/material/Looks4';
-// import { Looks5 } from '@styled-icons/material/Looks5';
-// import { Looks6 } from '@styled-icons/material/Looks6';
-// import { LooksOne } from '@styled-icons/material/LooksOne';
-// import { LooksTwo } from '@styled-icons/material/LooksTwo';
-
 import {
   BlockToolbarButton,
   CodeBlockToolbarButton,
@@ -60,7 +51,7 @@ export const BasicElementToolbarButtons = () => {
       <BlockToolbarButton type={getPluginType(editor, ELEMENT_H5)} icon={<Looks5RoundedIcon />} />
       <BlockToolbarButton type={getPluginType(editor, ELEMENT_H6)} icon={<Looks6RoundedIcon />} />
       <BlockToolbarButton type={getPluginType(editor, ELEMENT_BLOCKQUOTE)} icon={<FormatQuoteRoundedIcon />} />
-      {/* <CodeBlockToolbarButton type={getPluginType(editor, ELEMENT_CODE_BLOCK)} icon={<CodeBlock />} /> */}
+      <CodeBlockToolbarButton type={getPluginType(editor, ELEMENT_CODE_BLOCK)} icon={<CodeBlock />} />
     </>
   );
 };

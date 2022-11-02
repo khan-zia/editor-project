@@ -14,7 +14,7 @@ interface ServerRequest {
    * Type-hint (assert) the return Promise type as required. It will attempt to resolve the
    * promise on server response of 2xx.
    */
-  executeRequest: <T>(data?: { [field: string]: unknown } | null) => Promise<T | void>;
+  executeRequest: <T>(data?: { [field: string]: unknown } | FormData | null) => Promise<T | void>;
 
   /**
    * Reset internal state of the Request.
@@ -60,14 +60,21 @@ export const useServerRequest = (method: 'get' | 'post' | 'put' | 'delete', url:
     try {
       abortController.current = new AbortController();
 
-      // Todo: Base URL would typically come from an env.
+      /**
+       * Todo: Base URL would typically come from an env.
+       * 1. If data is defined, add it to the request.
+       * 2. If data is FormData then append it directly otherwise stringify it.
+       * 3. If data is not FormData then also add "application/json" header.
+       */
       const res = await fetch(`http://localhost:3001/${url}`, {
         method,
         ...(data && {
-          body: JSON.stringify(data),
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          body: data instanceof FormData ? (data as FormData) : JSON.stringify(data),
+          ...(!(data instanceof FormData) && {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }),
         }),
         signal: abortController.current.signal,
       });

@@ -1,19 +1,22 @@
 import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
+import { fetchNote } from './routes/notes';
 
 type NoteSocketPayload = (noteId: string, noteTitle: string) => void;
 
 // Events that the Server will send to the Client.
 export interface ServerToClientEvents {
   'incoming-new-note': NoteSocketPayload;
-  'incoming-new-title': (noteId: string, title: string) => void;
+  'incoming-new-title': NoteSocketPayload;
+  'incoming-note-update': (content: ArrayBuffer) => void;
 }
 
 // Events that Client will send to the Server.
 export interface ClientToServerEvents {
-  'join-note': (noteID: string) => void;
+  'join-note': (noteID: string, response: (title: string | null, content: ArrayBuffer | null) => void) => void;
   'new-note-created': NoteSocketPayload;
   'note-title-updated': NoteSocketPayload;
+  'note-updated': (noteId: string, content: ArrayBuffer) => void;
 }
 
 export class ServerSocket {
@@ -44,18 +47,48 @@ export class ServerSocket {
   registerListeners = (): void => {
     // Listener for when a client establishes a connection.
     this.io.on('connection', (socket) => {
-      // When a new note creation is completed, broadcast it to all other clients.
+      /**
+       * When a new note is created, broadcast it to all other clients.
+       */
       socket.on('new-note-created', (noteId, noteTitle) => {
         socket.broadcast.emit('incoming-new-note', noteId, noteTitle);
       });
 
-      // When a client visits a specific note, let the client join that room.
-      socket.on('join-note', (noteId) => socket.join(noteId));
+      /**
+       * When a client visits a specific note, let the client join that room,
+       * and fetch note's initial value from the database if any.
+       */
+      socket.on('join-note', async (noteId, response) => {
+        // Join room.
+        socket.join(noteId);
 
-      // When a note's title is updated,
+        // Fetch note's content.
+        const note = await fetchNote(noteId);
+
+        // If note could be fetched.
+        if (note) {
+          // Send it back over the same socket as response.
+          response(note.title, note.content);
+          return;
+        }
+
+        // Otherwise simply respond with "null" values
+        response(null, null);
+      });
+
+      /**
+       * When a note's title is updated, send the event to all connected (including current client).
+       * This is to update the title on the side bar menu in real time.
+       */
       socket.on('note-title-updated', (noteId, title) => {
-        // send the event to all connected clients. (To update the title on the side menu)
         this.io.emit('incoming-new-title', noteId, title);
+      });
+
+      // When a note's content is updated,
+      socket.on('note-updated', (noteId, content) => {
+        // transmit the change in real time to all other clients viewing the same note.
+        // These are clients that have joined the note's "room".
+        socket.to(noteId).emit('incoming-note-update', content);
       });
     });
   };

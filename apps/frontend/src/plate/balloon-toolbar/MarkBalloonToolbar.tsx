@@ -2,9 +2,6 @@ import React from 'react';
 import FormatBoldRoundedIcon from '@mui/icons-material/FormatBoldRounded';
 import FormatItalicRoundedIcon from '@mui/icons-material/FormatItalicRounded';
 import FormatUnderlinedRoundedIcon from '@mui/icons-material/FormatUnderlinedRounded';
-// import { FormatBold } from '@styled-icons/material/FormatBold';
-// import { FormatItalic } from '@styled-icons/material/FormatItalic';
-// import { FormatUnderlined } from '@styled-icons/material/FormatUnderlined';
 import { TippyProps } from '@tippyjs/react';
 import {
   BalloonToolbar,
