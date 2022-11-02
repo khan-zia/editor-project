@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo } from 'react';
 import {
   AutoformatPlugin,
   createAlignPlugin,
@@ -40,15 +40,16 @@ import {
   createUnderlinePlugin,
   Plate,
   PlateEditor as PlateEditorType,
+  createPlateEditor,
   PlateProvider,
 } from '@udecode/plate';
 
+import { basicNodesPlugins } from '../plate/basic-nodes/basicNodesPlugins';
 import { createJuicePlugin } from '@udecode/plate-juice';
 import { alignPlugin } from '../plate/align/alignPlugin';
 import { autoformatPlugin } from '../plate/autoformat/autoformatPlugin';
 import { MarkBalloonToolbar } from '../plate/balloon-toolbar/MarkBalloonToolbar';
 import { editableProps } from '../plate/common/editableProps';
-import { CursorOverlayContainer } from '../plate/cursor-overlay/CursorOverlayContainer';
 import { dragOverCursorPlugin } from '../plate/cursor-overlay/dragOverCursorPlugin';
 import { exitBreakPlugin } from '../plate/exit-break/exitBreakPlugin';
 import { indentPlugin } from '../plate/indent/indentPlugin';
@@ -71,6 +72,7 @@ type PlateEditorProps = {
 
 export const plugins = createMyPlugins(
   [
+    ...basicNodesPlugins,
     createParagraphPlugin(),
     createBlockquotePlugin(),
     createTodoListPlugin(),
@@ -110,22 +112,21 @@ export const plugins = createMyPlugins(
     createDeserializeDocxPlugin(),
     createJuicePlugin() as MyPlatePlugin,
   ],
-  {
-    components,
-  },
+  { components },
 );
 
 const PlateEditor: React.FC<PlateEditorProps> = ({ editor }) => {
-  const containerRef = useRef(null);
+  const e = useMemo(() => {
+    return createPlateEditor({ editor, plugins });
+  }, [editor]);
 
   return (
-    <PlateProvider<MyValue> editor={editor}>
+    <PlateProvider<MyValue> editor={e}>
       <Toolbar>
         <ToolbarButtons />
       </Toolbar>
       <Plate editableProps={editableProps}>
         <MarkBalloonToolbar />
-        <CursorOverlayContainer containerRef={containerRef} />
       </Plate>
     </PlateProvider>
   );

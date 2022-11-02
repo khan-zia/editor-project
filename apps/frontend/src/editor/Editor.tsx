@@ -6,13 +6,13 @@ import { Alert, Box, LinearProgress, Snackbar } from '@mui/material';
 import DoneRoundedIcon from '@mui/icons-material/DoneRounded';
 import * as Y from 'yjs';
 import { withYHistory, withYjs, YjsEditor, yTextToSlateElement } from '@slate-yjs/core';
-import { BaseEditor } from 'slate';
+import { createEditor } from 'slate';
 import { withReact } from 'slate-react';
 import hash from 'object-hash';
 import { useServerRequest } from '../notes/hooks';
-import PlateEditor, { plugins } from './Plate';
+import PlateEditor from './Plate';
 import { MyValue } from '../plate/typescript/plateTypes';
-import { createPlateEditor, PlateEditor as PlateEditorType } from '@udecode/plate';
+import { PlateEditor as PlateEditorType } from '@udecode/plate';
 import { useSocketContext } from '../context/socketContext';
 
 interface EditorProps {
@@ -58,7 +58,7 @@ export const Editor: React.FC<EditorProps> = ({ id, initialValue }) => {
       fd.append('content', new Blob([Y.encodeStateAsUpdate(ydoc.current)]));
       saveNote(fd);
     },
-    15000, // Only 4 times a minute
+    10000, // Once every 10 seconds.
     { leading: false }, // Do not fire immediately when called.
   );
 
@@ -117,7 +117,7 @@ export const Editor: React.FC<EditorProps> = ({ id, initialValue }) => {
     if (sharedType) {
       return withReact(
         withYHistory(
-          withYjs(createPlateEditor({ plugins }) as BaseEditor, sharedType, {
+          withYjs(createEditor(), sharedType, {
             localOrigin: `${thisOrigin.current}-${id}`,
           }),
         ),
