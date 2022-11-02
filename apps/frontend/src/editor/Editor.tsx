@@ -58,7 +58,7 @@ export const Editor: React.FC<EditorProps> = ({ id, initialValue }) => {
       fd.append('content', new Blob([Y.encodeStateAsUpdate(ydoc.current)]));
       saveNote(fd);
     },
-    1000, // Only 4 times a minute
+    15000, // Only 4 times a minute
     { leading: false }, // Do not fire immediately when called.
   );
 
