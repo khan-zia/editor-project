@@ -24,7 +24,7 @@ const plugins = createMyPlugins(
   ],
   {
     components: plateUI,
-  }
+  },
 );
 
 const styles: Record<string, CSSProperties> = {
@@ -37,7 +37,7 @@ const styles: Record<string, CSSProperties> = {
 export const EditableVoidElement = ({
   attributes,
   children,
-}: PlateRenderElementProps<MyValue, TElement>) => {
+}: PlateRenderElementProps<MyValue, TElement>): JSX.Element => {
   const [inputValue, setInputValue] = useState('');
 
   return (
@@ -54,21 +54,9 @@ export const EditableVoidElement = ({
           }}
         />
         <h4>Left or right handed:</h4>
-        <input
-          style={styles.radio}
-          type="radio"
-          name="handedness"
-          value="left"
-        />{' '}
-        Left
+        <input style={styles.radio} type="radio" name="handedness" value="left" /> Left
         <br />
-        <input
-          style={styles.radio}
-          type="radio"
-          name="handedness"
-          value="right"
-        />{' '}
-        Right
+        <input style={styles.radio} type="radio" name="handedness" value="right" /> Right
         <h4>Tell us about yourself:</h4>
         <div style={styles.editor}>
           <Plate<MyValue, MyEditor>

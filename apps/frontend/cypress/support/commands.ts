@@ -22,3 +22,7 @@ Cypress.Commands.add('createNewNote', (data = null) => {
     });
   });
 });
+
+// To satisfy the --isolatedModules. Even if the compiler option for isolatedModules is set to false in tsconfig,
+// NextJS will reset it to true on each build internally.
+export {};

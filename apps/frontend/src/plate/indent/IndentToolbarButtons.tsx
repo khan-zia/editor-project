@@ -4,7 +4,7 @@ import FormatIndentIncreaseRoundedIcon from '@mui/icons-material/FormatIndentInc
 import { indent, outdent, ToolbarButton } from '@udecode/plate';
 import { useMyPlateEditorRef } from '../typescript/plateTypes';
 
-export const IndentToolbarButtons = () => {
+export const IndentToolbarButtons = (): JSX.Element => {
   const editor = useMyPlateEditorRef();
 
   return (

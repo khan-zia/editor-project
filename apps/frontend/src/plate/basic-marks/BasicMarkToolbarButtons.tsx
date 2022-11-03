@@ -25,7 +25,7 @@ const CodeAlt = () => (
   </svg>
 );
 
-export const BasicMarkToolbarButtons = () => {
+export const BasicMarkToolbarButtons = (): JSX.Element => {
   const editor = useMyPlateEditorRef();
 
   return (

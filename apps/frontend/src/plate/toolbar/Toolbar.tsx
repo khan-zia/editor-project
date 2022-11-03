@@ -1,4 +1,4 @@
 import React from 'react';
 import { HeadingToolbar, ToolbarProps } from '@udecode/plate';
 
-export const Toolbar = (props: ToolbarProps) => <HeadingToolbar {...props} />;
+export const Toolbar = (props: ToolbarProps): JSX.Element => <HeadingToolbar {...props} />;

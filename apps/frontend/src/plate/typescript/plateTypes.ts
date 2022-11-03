@@ -37,10 +37,12 @@ import {
   ENodeEntry,
   EText,
   ETextEntry,
+  GetRecord,
   getTEditor,
   InjectComponent,
   InjectProps,
   KeyboardHandler,
+  Modify,
   NoInfer,
   OnChange,
   OverrideByKey,
@@ -51,8 +53,10 @@ import {
   PlatePluginInsertData,
   PlatePluginProps,
   PlateProps,
+  PlateStoreState,
   PluginOptions,
   SerializeHtml,
+  SetRecord,
   TElement,
   TImageElement,
   TLinkElement,
@@ -60,6 +64,7 @@ import {
   TMentionElement,
   TMentionInputElement,
   TNodeEntry,
+  TOperation,
   TReactEditor,
   TTableElement,
   TText,
@@ -71,6 +76,7 @@ import {
   usePlateEditorState,
   usePlateSelectors,
   usePlateStates,
+  UseRecord,
   WithOverride,
 } from '@udecode/plate';
 import { CSSProperties } from 'styled-components';
@@ -303,18 +309,21 @@ export type MyWithOverride<P = PluginOptions> = WithOverride<P, MyValue, MyEdito
  */
 
 export const getMyEditor = (editor: MyEditor) => getTEditor<MyValue, MyEditor>(editor);
-export const useMyEditorRef = () => useEditorRef<MyValue, MyEditor>();
-export const useMyEditorState = () => useEditorState<MyValue, MyEditor>();
-export const useMyPlateEditorRef = (id?: PlateId) => usePlateEditorRef<MyValue, MyEditor>(id);
-export const useMyPlateEditorState = (id?: PlateId) => usePlateEditorState<MyValue, MyEditor>(id);
-export const useMyPlateSelectors = (id?: PlateId) => usePlateSelectors<MyValue, MyEditor>(id);
-export const useMyPlateActions = (id?: PlateId) => usePlateActions<MyValue, MyEditor>(id);
-export const useMyPlateStates = (id?: PlateId) => usePlateStates<MyValue, MyEditor>(id);
+export const useMyEditorRef = (): MyEditor => useEditorRef<MyValue, MyEditor>();
+export const useMyEditorState = (): MyEditor => useEditorState<MyValue, MyEditor>();
+export const useMyPlateEditorRef = (id?: PlateId): MyEditor => usePlateEditorRef<MyValue, MyEditor>(id);
+export const useMyPlateEditorState = (id?: PlateId): MyEditor => usePlateEditorState<MyValue, MyEditor>(id);
+export const useMyPlateSelectors = (id?: PlateId): GetRecord<PlateStoreState<MyValue, MyEditor>> =>
+  usePlateSelectors<MyValue, MyEditor>(id);
+export const useMyPlateActions = (id?: PlateId): SetRecord<PlateStoreState<MyValue, MyEditor>> =>
+  usePlateActions<MyValue, MyEditor>(id);
+export const useMyPlateStates = (id?: PlateId): UseRecord<PlateStoreState<MyValue, MyEditor>> =>
+  usePlateStates<MyValue, MyEditor>(id);
 
 /**
  * Utils
  */
-export const createMyEditor = () => createTEditor() as MyEditor;
+export const createMyEditor = (): MyEditor => createTEditor() as MyEditor;
 export const createMyPlateEditor = (options: CreatePlateEditorOptions<MyValue, MyEditor> = {}) =>
   createPlateEditor<MyValue, MyEditor>(options);
 export const createMyPluginFactory = <P = PluginOptions>(defaultPlugin: PlatePlugin<NoInfer<P>, MyValue, MyEditor>) =>

@@ -1,6 +1,14 @@
-import { ELEMENT_H1, ELEMENT_PARAGRAPH, withPlaceholders } from '@udecode/plate'
+import {
+  DefaultPlatePluginKey,
+  ELEMENT_H1,
+  ELEMENT_PARAGRAPH,
+  PlatePluginComponent,
+  withPlaceholders,
+} from '@udecode/plate';
 
-export const withStyledPlaceHolders = (components: any) =>
+export const withStyledPlaceHolders = (
+  components: unknown,
+): Record<DefaultPlatePluginKey, PlatePluginComponent<unknown>> =>
   withPlaceholders(components, [
     {
       key: ELEMENT_PARAGRAPH,
@@ -12,4 +20,4 @@ export const withStyledPlaceHolders = (components: any) =>
       placeholder: 'Untitled',
       hideOnBlur: false,
     },
-  ])
+  ]);

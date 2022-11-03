@@ -1,14 +1,14 @@
-## Repository structure
-
-We follow the monorepo pattern:
-
-- [apps](apps) contains executable and deployable packages:
-  - [frontend](apps/frontend) contains the user facing Next.JS app.
-  - [backend](apps/backend) contains the backend express app.
+## Quick demo at youtube.
 
 ## How to run the system
 
-Start the dev server on [http://localhost:3000](http://localhost:3000) by running **`npm run dev`** in the root folder.
+I did not commit credentials for my Google's service account. Please make sure to add yours at **`./apps/backend/serviceAccountKey.json`**
+
+- clone the repo
+- run `yarn` in the root directory
+- run `yarn dev` in the root directory to start both front and backend at the same time.
+
+You can now navigate to [http://localhost:3000](http://localhost:3000) to see the app running.
 
 ## Type checking and linting
 

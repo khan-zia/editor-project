@@ -17,7 +17,7 @@ import {
   TableToolbarButton,
 } from '@udecode/plate';
 
-export const TableToolbarButtons = () => (
+export const TableToolbarButtons = (): JSX.Element => (
   <>
     <TableToolbarButton icon={<BorderAllRoundedIcon />} transform={insertTable} />
     <TableToolbarButton icon={<BorderClearRoundedIcon />} transform={deleteTable} />

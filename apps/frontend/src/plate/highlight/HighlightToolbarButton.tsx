@@ -8,7 +8,7 @@ const Highlight = () => (
   </svg>
 );
 
-export const HighlightToolbarButton = () => {
+export const HighlightToolbarButton = (): JSX.Element => {
   const editor = useMyPlateEditorRef();
 
   return <MarkToolbarButton type={getPluginType(editor, MARK_HIGHLIGHT)} icon={<Highlight />} />;

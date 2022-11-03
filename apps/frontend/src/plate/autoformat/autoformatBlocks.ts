@@ -12,9 +12,10 @@ import {
   getPluginType,
   insertEmptyCodeBlock,
   insertNodes,
+  PlateEditor,
   setNodes,
 } from '@udecode/plate';
-import { MyAutoformatRule } from '../typescript/plateTypes';
+import { MyAutoformatRule, MyValue } from '../typescript/plateTypes';
 import { preFormat } from './autoformatUtils';
 
 export const autoformatBlocks: MyAutoformatRule[] = [
@@ -66,7 +67,7 @@ export const autoformatBlocks: MyAutoformatRule[] = [
     match: '```',
     triggerAtBlockStart: false,
     preFormat,
-    format: (editor) => {
+    format: (editor: PlateEditor<MyValue>): void => {
       insertEmptyCodeBlock(editor, {
         defaultType: getPluginType(editor, ELEMENT_DEFAULT),
         insertNodesOptions: { select: true },
@@ -77,7 +78,7 @@ export const autoformatBlocks: MyAutoformatRule[] = [
     mode: 'block',
     type: ELEMENT_HR,
     match: ['---', '—-', '___ '],
-    format: (editor) => {
+    format: (editor: PlateEditor<MyValue>): void => {
       setNodes(editor, { type: ELEMENT_HR });
       insertNodes(editor, {
         type: ELEMENT_DEFAULT,

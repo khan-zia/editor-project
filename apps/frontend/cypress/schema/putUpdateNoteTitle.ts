@@ -48,7 +48,7 @@ const UpdateTitleFailureResponse: ObjectSchema = {
   },
   schema: {
     title: 'UpdateTitleFailure',
-    type: null,
+    type: 'object',
     description: 'Response of the backend when updating a note title fails.',
     properties: {
       success: {

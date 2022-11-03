@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nodemon app.ts",
-    "check": "yarn run typecheck && yarn run lint && yarn run test",
+    "check": "yarn run typecheck && yarn run lint",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx .",
     "lint-fix": "yarn run lint -- --fix",
     "typecheck": "tsc",

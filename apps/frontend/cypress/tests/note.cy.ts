@@ -75,12 +75,12 @@ describe("Navigating to an individual note and being able to update it's title."
     // When updating the title completes, assert against the response.
     cy.wait('@updateTitleRequest')
       .its('response')
-      .then(({ body, statusCode }) => {
-        expect(statusCode).to.eq(200);
+      .then((response) => {
+        expect(response?.statusCode).to.eq(200);
 
         // Asserts json schema structure. Response body must be the same
         // as the expected json schema.
-        api.assertSchema('UpdateTitleSuccess', '1.0.0')(body);
+        api.assertSchema('UpdateTitleSuccess', '1.0.0')(response?.body);
       });
   });
 });

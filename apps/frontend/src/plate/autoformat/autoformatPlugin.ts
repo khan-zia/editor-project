@@ -1,12 +1,10 @@
-import { AutoformatPlugin } from '@udecode/plate';
+import { AutoformatPlugin, AutoformatRule } from '@udecode/plate';
 import { MyEditor, MyPlatePlugin, MyValue } from '../typescript/plateTypes';
 import { autoformatRules } from './autoformatRules';
 
-export const autoformatPlugin: Partial<
-  MyPlatePlugin<AutoformatPlugin<MyValue, MyEditor>>
-> = {
+export const autoformatPlugin: Partial<MyPlatePlugin<AutoformatPlugin<MyValue, MyEditor>>> = {
   options: {
-    rules: autoformatRules as any,
+    rules: autoformatRules as AutoformatRule<MyValue, MyEditor>[],
     enableUndoOnDelete: true,
   },
 };

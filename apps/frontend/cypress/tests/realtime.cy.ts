@@ -1,3 +1,8 @@
+// To satisfy the --isolatedModules. Even if the compiler option for isolatedModules is set to false in tsconfig,
+// NextJS will reset it to true on each build internally. This should be deleted when any import or export from this
+// file is done in the future.
+export {};
+
 /**
  * TO LEARN HOW THESE TESTS WORK,
  * read the docs at cypress.config.ts

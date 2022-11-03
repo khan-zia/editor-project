@@ -68,18 +68,18 @@ describe('Rendering the landing page and being able to create a new note.', () =
     // against the response.
     cy.wait('@createNoteRequest')
       .its('response')
-      .then(({ body, statusCode }) => {
-        expect(statusCode).to.eq(200);
+      .then((response) => {
+        expect(response?.statusCode).to.eq(200);
 
         // Asserts json schema structure. Response body must be the same
         // as the expected json schema.
-        api.assertSchema('CreateNewNoteSuccess', '1.0.0')(body);
+        api.assertSchema('CreateNewNoteSuccess', '1.0.0')(response?.body);
 
         // Sanitize response body. Because volatile values can not be deterministically
         // tested. e.g. Note's ID is random and will be different every time. We only
         // validate it against a defined regex format and then we substitute it by an example
         // value. The example value can then be deterministically checked against a stored snapshot.
-        const res = api.sanitize('CreateNewNoteSuccess', '1.0.0')(body);
+        const res = api.sanitize('CreateNewNoteSuccess', '1.0.0')(response?.body);
 
         // Check that the response body matches a store snapshot. If no snapshot exist for this
         // request, it will be created and stored as the first time.

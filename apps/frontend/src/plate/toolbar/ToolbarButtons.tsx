@@ -23,7 +23,7 @@ import { IndentToolbarButtons } from '../indent/IndentToolbarButtons';
 import { ListToolbarButtons } from '../list/ListToolbarButtons';
 import { TableToolbarButtons } from '../table/TableToolbarButtons';
 
-export const ToolbarButtons = () => {
+export const ToolbarButtons = (): JSX.Element => {
   const colorTooltip: TippyProps = { content: 'Text color' };
   const bgTooltip: TippyProps = { content: 'Text color' };
 

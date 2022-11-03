@@ -39,7 +39,7 @@ const CodeBlock = () => (
   </svg>
 );
 
-export const BasicElementToolbarButtons = () => {
+export const BasicElementToolbarButtons = (): JSX.Element => {
   const editor = useMyPlateEditorRef(useEventPlateId());
 
   return (

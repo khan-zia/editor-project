@@ -4,7 +4,7 @@ import FormatListNumberedRoundedIcon from '@mui/icons-material/FormatListNumbere
 import { ELEMENT_OL, ELEMENT_UL, getPluginType, ListToolbarButton } from '@udecode/plate';
 import { useMyPlateEditorRef } from '../typescript/plateTypes';
 
-export const ListToolbarButtons = () => {
+export const ListToolbarButtons = (): JSX.Element => {
   const editor = useMyPlateEditorRef();
 
   return (

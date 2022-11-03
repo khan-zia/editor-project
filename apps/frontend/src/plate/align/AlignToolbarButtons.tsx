@@ -5,7 +5,7 @@ import FormatAlignLeftRoundedIcon from '@mui/icons-material/FormatAlignLeftRound
 import FormatAlignRightRoundedIcon from '@mui/icons-material/FormatAlignRightRounded';
 import { AlignToolbarButton } from '@udecode/plate';
 
-export const AlignToolbarButtons = () => {
+export const AlignToolbarButtons = (): JSX.Element => {
   return (
     <>
       <AlignToolbarButton value="left" icon={<FormatAlignLeftRoundedIcon />} />

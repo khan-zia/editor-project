@@ -31,27 +31,6 @@ const Request: ObjectSchema = {
   example: RequestExample,
 };
 
-// What will the backend return if creating a note fails.
-// typically an object but our backend returns just "null" for this demo.
-type NoteCreationFailureResponse = null;
-
-const NoteCreationFailureExample: NoteCreationFailureResponse = null;
-
-const NoteCreationFailureResponse: ObjectSchema = {
-  version: {
-    major: 1,
-    minor: 0,
-    patch: 0,
-  },
-  schema: {
-    title: 'CreateNewNoteFailure',
-    type: null,
-    description: 'Response of the backend when creating a new note fails.',
-    ...strictProperties,
-  },
-  example: NoteCreationFailureExample,
-};
-
 // When the backend succeeds creating a new note, what will the response look like?
 // It returns ID and title of the newly created note.
 type NoteCreationSuccessResponse = {
@@ -91,5 +70,4 @@ export const NoteCreationSuccessResponse: ObjectSchema = {
 };
 
 export const CreateNewNoteRequest = versionSchemas(Request);
-export const CreateNewNoteFailure = versionSchemas(NoteCreationFailureResponse);
 export const CreateNewNoteSuccess = versionSchemas(NoteCreationSuccessResponse);
