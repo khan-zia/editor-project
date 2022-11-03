@@ -41,7 +41,7 @@ const NotesList: React.FC<NotesListProps> = ({ activeNoteId }) => {
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>
-            <ListItemText primary={note.title} />
+            <ListItemText primary={note.title} data-cy="note-sidebar-title" />
           </ListItemButton>
         </Link>
       ))}

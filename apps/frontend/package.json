@@ -39,14 +39,18 @@
     "yjs": "^13.5.42"
   },
   "devDependencies": {
+    "@cypress/schema-tools": "^4.7.9",
     "@types/object-hash": "^2.2.1",
     "@types/prismjs": "^1.26.0",
     "@types/react": "17.0.27",
     "@types/react-dom": "^18.0.8",
     "@types/styled-components": "^5.1.26",
+    "cypress": "^10.11.0",
+    "cypress-plugin-snapshots": "^1.4.4",
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.2",
     "http-proxy-middleware": "^2.0.1",
+    "path": "^0.12.7",
     "typescript": "4.4.3"
   }
 }

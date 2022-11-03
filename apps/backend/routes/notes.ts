@@ -92,20 +92,20 @@ const createNoteHandler: RequestHandler = async (req, res: Response<Omit<Note, '
 };
 
 // Update a note's title
-const updateNoteTitleHandler: RequestHandler = async (req, res: Response<true | null>) => {
+const updateNoteTitleHandler: RequestHandler = async (req, res: Response<Record<string, unknown>>) => {
   try {
     await db.collection('notes').doc(req.params.id).update({
       title: req.body.title,
     });
 
-    res.json(true);
+    res.json({ success: true });
   } catch (_e) {
-    res.status(500).json(null);
+    res.status(500).json({ success: false });
   }
 };
 
 // Update a note's content
-const updateNoteContentHandler: RequestHandler = async (req, res: Response<true | null>) => {
+const updateNoteContentHandler: RequestHandler = async (req, res: Response<Record<string, unknown>>) => {
   try {
     // Simple validation
     if (!req.file) {
@@ -116,9 +116,9 @@ const updateNoteContentHandler: RequestHandler = async (req, res: Response<true 
       content: req.file.buffer,
     });
 
-    res.json(true);
+    res.json({ success: true });
   } catch (_e) {
-    res.status(500).json(null);
+    res.status(500).json({ success: false });
   }
 };
 

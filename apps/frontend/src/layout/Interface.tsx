@@ -32,7 +32,7 @@ const Interface: React.FC<InterfaceProps> = ({ activeNoteId, children }) => {
           }}
         >
           <Toolbar>
-            <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
+            <Typography data-cy="notes-logo" component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
               Notes
             </Typography>
             <NoteAddRoundedIcon
@@ -45,6 +45,7 @@ const Interface: React.FC<InterfaceProps> = ({ activeNoteId, children }) => {
                 },
               }}
               onClick={addNewNote}
+              data-cy="add-note-button"
             />
           </Toolbar>
           <Divider />

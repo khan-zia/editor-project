@@ -45,12 +45,12 @@ export class ServerSocket {
    * Typically used when a fresh WS server is instantiated.
    */
   registerListeners = (): void => {
-    // Listener for when a client establishes a connection.
     this.io.on('connection', (socket) => {
       /**
        * When a new note is created, broadcast it to all other clients.
        */
       socket.on('new-note-created', (noteId, noteTitle) => {
+        console.log(noteId, noteTitle);
         socket.broadcast.emit('incoming-new-note', noteId, noteTitle);
       });
 

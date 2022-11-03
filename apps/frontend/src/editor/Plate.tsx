@@ -121,14 +121,16 @@ const PlateEditor: React.FC<PlateEditorProps> = ({ editor }) => {
   }, [editor]);
 
   return (
-    <PlateProvider<MyValue> editor={e}>
-      <Toolbar>
-        <ToolbarButtons />
-      </Toolbar>
-      <Plate editableProps={editableProps}>
-        <MarkBalloonToolbar />
-      </Plate>
-    </PlateProvider>
+    <div data-cy="note-editor">
+      <PlateProvider<MyValue> editor={e}>
+        <Toolbar>
+          <ToolbarButtons />
+        </Toolbar>
+        <Plate editableProps={editableProps}>
+          <MarkBalloonToolbar />
+        </Plate>
+      </PlateProvider>
+    </div>
   );
 };
 

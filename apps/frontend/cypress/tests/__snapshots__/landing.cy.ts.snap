@@ -1,0 +1,11 @@
+exports[`Rendering the landing page properly. > Can create a new note. #0`] =
+{
+  "id": "1JrclVI6sP3zw03xs3m7",
+  "title": "Awesome Note"
+};
+
+exports[`Rendering the landing page and being able to create a new note. > Can create a new note. #0`] =
+{
+  "id": "1JrclVI6sP3zw03xs3m7",
+  "title": "Awesome Note"
+};

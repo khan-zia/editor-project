@@ -116,15 +116,16 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
   return (
     <>
       {fetching && (
-        <>
+        <div data-cy="note-loading-state">
           <Skeleton sx={{ fontSize: '3.5rem', bgcolor: 'white' }} />
           <Skeleton variant="rectangular" height={400} sx={{ bgcolor: 'white' }} />
-        </>
+        </div>
       )}
       {content && (
         <>
           <Badge color={connectionStatusColor} variant="dot" sx={{ width: '100%' }}>
             <TextField
+              name="note-title-field"
               value={title}
               variant="standard"
               fullWidth={true}
@@ -133,11 +134,16 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
               onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.currentTarget.value)}
               InputProps={{
                 endAdornment: localTitle !== title && (
-                  <LoadingButton loading={noteTitleUpdating} onClick={() => updateNoteTitle({ title })}>
+                  <LoadingButton
+                    loading={noteTitleUpdating}
+                    onClick={() => updateNoteTitle({ title })}
+                    data-cy="title-save-button"
+                  >
                     Save
                   </LoadingButton>
                 ),
               }}
+              data-cy="note-title-field"
             />
           </Badge>
           <Paper

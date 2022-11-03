@@ -30,7 +30,7 @@ const NewNoteDialog: React.FC<NewNoteDialogProps> = ({ open, handleClose }) => {
 
   const create = async () => {
     if (!title) {
-      setError('Choose a name for your note.');
+      setError('Choose a title for your note.');
       return;
     }
 
@@ -59,10 +59,14 @@ const NewNoteDialog: React.FC<NewNoteDialogProps> = ({ open, handleClose }) => {
   }, [isError]);
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" data-cy="new-note-dialog">
       <DialogTitle>Create a new note</DialogTitle>
       <DialogContent>
-        {error && <DialogContentText sx={{ color: 'red' }}>{error}</DialogContentText>}
+        {error && (
+          <DialogContentText sx={{ color: 'red' }} data-cy="note-error-message">
+            {error}
+          </DialogContentText>
+        )}
         <DialogContentText>Choose a title for your note.</DialogContentText>
         <TextField
           autoFocus
@@ -73,13 +77,14 @@ const NewNoteDialog: React.FC<NewNoteDialogProps> = ({ open, handleClose }) => {
           fullWidth
           variant="standard"
           onChange={(e) => setTitle(e.target.value)}
+          data-cy="new-note-input"
         />
       </DialogContent>
       <DialogActions>
-        <Button disabled={isLoading} onClick={handleClose}>
+        <Button disabled={isLoading} onClick={handleClose} data-cy="close-dialog-button">
           Cancel
         </Button>
-        <LoadingButton loading={isLoading} onClick={create}>
+        <LoadingButton loading={isLoading} onClick={create} data-cy="create-note-button">
           Create
         </LoadingButton>
       </DialogActions>

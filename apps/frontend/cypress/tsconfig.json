@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "allowJs": true,
+    "types": ["cypress"]
+  },
+  "include": ["./**/*.*"],
+  "exclude": ["./build/**/*"]
+}
