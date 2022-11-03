@@ -23,12 +23,12 @@ Run it in all apps from the root by running: `npm run check --workspaces`. You m
 Cypress is used for testing. To visualize tests, install Cypress client or run it headless (in the terminal). To run tests:
 
 - Ensure system is up. Frontend at [http://localhost:3000](http://localhost:3000) and backend at [http://localhost:3001](http://localhost:3001)
-- Go to the **`./apps/frontend`** directory and run **`yarn run cypress open`** to run tests via the Cypress client (Chrome or Elector).
+- Go to the **`./apps/frontend`** directory and run **`yarn run cypress open`** to run tests via the Cypress client (Chrome or Electron).
 - Go to the **`./apps/frontend`** directory and run **`yarn run cypress run`** to run tests in the terminal.
 
 ### About tests
 
-I have used JSON Schema based validation. There wasn't much in this test project but basically schema validation when combined with Cypress, allows you to assert against the **exact server response** e.g. object structure, data types or regex patterns for certain values. I have also used snapshots. It stores servers response's exact payload as a snapshot for a particular request and then in all subsequent tests, compares to assert that the payload doesn't change.
+I have used JSON Schema based validation. There wasn't much in this test project but basically schema validation when combined with Cypress, allows you to assert against the **exact server response** e.g. object structure, data types or regex patterns for certain values. I have also used snapshots. It stores server response's exact payload as a snapshot for a particular request and then in all subsequent tests, asserts that the payload didn't change.
 
 ## General
 
