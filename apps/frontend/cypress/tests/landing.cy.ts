@@ -88,7 +88,7 @@ describe('Rendering the landing page and being able to create a new note.', () =
 
     // The user should land on the new note's page.
     const base = Cypress.config().baseUrl + '/notes/';
-    cy.url()
+    cy.url({ timeout: 10000 })
       .should('include', base)
       .then((url) => {
         // New note's ID is expected to be a 20 chars alphanumeric string.
