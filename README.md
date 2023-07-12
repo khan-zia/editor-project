@@ -1,9 +1,3 @@
-## Quick demo at youtube.
-
-I have recorded a 7 minutes demo where I quickly go over the features. Feel free to set playback speed at 1.5x or 2x to save time.
-
-https://youtu.be/H-1UqZRnekw
-
 ## How to run the system
 
 I did not commit credentials for my Google's service account. Please make sure to add yours at **`./apps/backend/serviceAccountKey.json`**
